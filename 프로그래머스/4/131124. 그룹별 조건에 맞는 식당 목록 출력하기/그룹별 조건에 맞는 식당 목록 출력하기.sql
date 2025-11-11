@@ -1,0 +1,19 @@
+-- 코드를 입력하세요
+SELECT 
+    m.MEMBER_NAME , r.REVIEW_TEXT , DATE_FORMAT(r.REVIEW_DATE,'%Y-%m-%d') AS REVIEW_DATE
+FROM 
+    MEMBER_PROFILE AS m  
+JOIN 
+    REST_REVIEW AS r ON m.MEMBER_ID = r.MEMBER_ID
+WHERE m.MEMBER_ID IN ( 
+        SELECT MEMBER_ID
+        FROM (
+            SELECT
+                MEMBER_ID,
+                DENSE_RANK() OVER (ORDER BY COUNT(MEMBER_ID) DESC) AS rk
+            FROM REST_REVIEW
+            GROUP BY MEMBER_ID
+        ) AS ranked_members 
+        WHERE rk = 1
+    )
+ORDER BY REVIEW_DATE , REVIEW_TEXT ;
